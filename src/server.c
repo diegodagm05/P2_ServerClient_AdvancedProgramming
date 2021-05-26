@@ -20,6 +20,16 @@
 #define PORT 1025
 #define BUFFSIZE 100
 
+#define TCOUNT 5
+
+int MAT[2000][2000];
+int SUM = 0;
+
+struct arguments {
+    int size;
+    int tnum;
+};
+
 void function1(int n) {
     // Array of numbers
     int x[n], y[n], xy[n], x2[n], y2[n];
@@ -62,6 +72,57 @@ void function1(int n) {
     // TODO: Responder al cliente con hora y formula
 
 }
+
+void *sumScalar(void *args) {
+    int size = ((struct arguments *)args)->size;
+    int tnum = ((struct arguments *)args)->tnum;
+
+    for(int i = (size / TCOUNT) * tnum; i < (size / TCOUNT) * (tnum+1); i++) {
+        for (int j = 0; j < size; j++) {
+            SUM += MAT[i][j];
+        }
+    }
+}
+
+
+void function3(int n) {
+    srand(time(0));
+
+    // Fill matrix with random values
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            MAT[i][j] = (rand() % (50)) + 1;
+        }
+    }
+
+    // Display random matrix
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            printf("%d\t", MAT[i][j]);
+        }
+        printf("\n");
+    }
+
+    // Initialize pthreads
+    pthread_t tids[TCOUNT];
+
+    // Assign each pthread task
+    for (int i = 0; i < TCOUNT; i++) {
+        struct arguments *args = (struct arguments *)malloc(sizeof(struct arguments));
+        args->size = n;
+        args->tnum  = i;
+        pthread_create(&tids[i], NULL, sumScalar, (void *)args);
+    }
+
+    for (int i = 0; i < TCOUNT; i++) {
+        pthread_join(tids[i], NULL);
+    }
+    
+    printf("Sum = %d\n", SUM);
+
+    // TODO: Responder al cliente con SUM y hora
+}
+
 
 int main(int argc, char *argv[]) {
     
