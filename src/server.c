@@ -15,11 +15,53 @@
 #include <arpa/inet.h>
 
 #include <omp.h>
+#include <time.h>
 
 #define PORT 1025
 #define BUFFSIZE 100
 
+void function1(int n) {
+    // Array of numbers
+    int x[n], y[n], xy[n], x2[n], y2[n];
+    // Sum values
+    float ex, ey, exy, ex2, ey2;
+    // Linear regression components
+    float a, b;
 
+    srand(time(0));
+
+
+    // Fill arrays
+    for (int i = 0; i < n; i++) {
+        // Determine x and y values
+        x[i] = i;
+        y[i] = (rand() % (50)) + 1;
+
+        // Fill other arrays
+        xy[i] = x[i] * y[i];
+        x2[i] = x[i] * x[i];
+        y2[i] = y[i] * y[i];
+    }
+
+    // Find sum values
+    for (int i = 0; i < n; i++) {
+        ex += x[i];
+        ey += y[i];
+        exy += xy[i];
+        ex2 += x2[i];
+        ey2 += y2[i];
+    }
+
+    // Find a and b values
+    a = (ey * ex2 - ex * exy) / (n * ex2 - ex * ex);
+    b = (n * exy - ex * ey) / (n * ex2 - ex * ex);
+
+    // Display linear regression formula
+    printf("y = %.4fx + %.4f\n", b, a);
+
+    // TODO: Responder al cliente con hora y formula
+
+}
 
 int main(int argc, char *argv[]) {
     
@@ -71,6 +113,7 @@ int main(int argc, char *argv[]) {
         if( number % 9 == 0 ){
             //funcion 1
             printf("divisible entre 9: %s\n", buffer);
+            function1(atoi(buffer));
         }
         else if( number % 7 == 0 ){
             //funcion 2
