@@ -17,7 +17,7 @@
 #define PORT 1025
 #define BUFFSIZE 100
 
-int main() {    
+int main(int argc, char *argv[]) {    
     
     // Crear socket TCP    
     int fd = socket(AF_INET, SOCK_STREAM, 0); 
@@ -54,8 +54,7 @@ int main() {
     // Leer buffer de cliente
     read(connfd, buffer, BUFFSIZE);
 
-
-
+    printf("%s\n ", buffer);
 
     // Responder a cliente
     write(connfd, buffer, strlen(buffer));
