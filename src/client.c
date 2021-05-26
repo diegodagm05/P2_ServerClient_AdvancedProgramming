@@ -20,7 +20,7 @@
 
 int main(int argc, char *argv[]){
     
-    // Crear socket TCP    
+    // Crear socket TCP
     int fd = socket(AF_INET, SOCK_STREAM, 0);
 
     // Establecer conexion
@@ -29,10 +29,12 @@ int main(int argc, char *argv[]){
     addr.sin_port = htons(PORT);    
     inet_pton(AF_INET, IP, &addr.sin_addr);    
     if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) == -1) {        
-        perror("Unable to connect\n");        
-        close(fd);        
-        exit(1);    
+        perror("Unable to connect\n");       
+        close(fd);
+        exit(1);  
     }
+    
+    // printf("%s\n", argv[1]);
     
     // Write to server
     write(fd, argv[1], strlen(argv[1])); //argumento al ejecutar
