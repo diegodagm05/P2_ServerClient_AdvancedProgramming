@@ -15,6 +15,7 @@
 #include <arpa/inet.h>
 
 #include <omp.h>
+#include <pthread.h>
 #include <time.h>
 
 #define PORT 1025
@@ -82,6 +83,25 @@ void *sumScalar(void *args) {
             SUM += MAT[i][j];
         }
     }
+}
+
+void function2(int n){
+    static long total_steps = 100000;
+    double step;
+    int i;
+    double x, pi, sum = 0.0;
+    step = 1.0/(double)total_steps;
+    #pragma omp parallel
+    {
+        double x;
+        #pragma omp for reduction (+:sum)
+            for(i=0; i<total_steps; i++){
+                x = (i+0.5)*step;
+                sum = sum + 4.0/(1.0+x*x);
+            }
+    }
+    pi = step * sum;
+    printf("%.10f\n",pi);
 }
 
 
@@ -178,6 +198,7 @@ int main(int argc, char *argv[]) {
         }
         else if( number % 7 == 0 ){
             //funcion 2
+            function2(number);
             printf("divisible entre 7: %s\n", buffer);
         }
         else if( number % 5 == 0 ){
