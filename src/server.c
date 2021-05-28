@@ -31,7 +31,7 @@ struct arguments {
     int tnum;
 };
 
-void function1(int n) {
+void linearRegression(int n, char formula[50]){
     // Array of numbers
     int x[n], y[n], xy[n], x2[n], y2[n];
     // Sum values
@@ -67,25 +67,11 @@ void function1(int n) {
     a = (ey * ex2 - ex * exy) / (n * ex2 - ex * ex);
     b = (n * exy - ex * ey) / (n * ex2 - ex * ex);
 
-    // Display linear regression formula
-    printf("y = %.4fx + %.4f\n", b, a);
-
-    // TODO: Responder al cliente con hora y formula
-
+    // Store linear regression formula in variable
+    sprintf(formula,"y = %.4fx + %.4f", b, a);
 }
 
-void *sumScalar(void *args) {
-    int size = ((struct arguments *)args)->size;
-    int tnum = ((struct arguments *)args)->tnum;
-
-    for(int i = (size / TCOUNT) * tnum; i < (size / TCOUNT) * (tnum+1); i++) {
-        for (int j = 0; j < size; j++) {
-            SUM += MAT[i][j];
-        }
-    }
-}
-
-void function2(int n){
+void piValue(int n, char piValue[12]){
     static long total_steps = 100000;
     double step;
     int i;
@@ -101,11 +87,21 @@ void function2(int n){
             }
     }
     pi = step * sum;
-    printf("%.10f\n",pi);
+    sprintf(piValue,"PI = %.10f",pi);
 }
 
+void *sumScalar(void *args) {
+    int size = ((struct arguments *)args)->size;
+    int tnum = ((struct arguments *)args)->tnum;
 
-void function3(int n) {
+    for(int i = (size / TCOUNT) * tnum; i < (size / TCOUNT) * (tnum+1); i++) {
+        for (int j = 0; j < size; j++) {
+            SUM += MAT[i][j];
+        }
+    }
+}
+
+void function3(int n, char sum[50]) {
     srand(time(0));
 
     // Fill matrix with random values
@@ -138,9 +134,7 @@ void function3(int n) {
         pthread_join(tids[i], NULL);
     }
     
-    printf("Sum = %d\n", SUM);
-
-    // TODO: Responder al cliente con SUM y hora
+    sprintf(sum, "Matrix Sum = %d", SUM);
 }
 
 void currentTime(char timeString[9]){ // space for "HH:MM:SS\0"
@@ -199,35 +193,34 @@ int main(int argc, char *argv[]) {
         read(connfd, buffer, BUFFSIZE);
 
         int number = atoi(buffer); //store the number read from client
+        char threadAnswer[50];
 
-        if( number % 9 == 0 ){
+        if( number % 9 == 0 ){ //funcion 1
             printf("divisible entre 9: %s\n", buffer);
-            //funcion 1
-            function1(atoi(buffer));
+            linearRegression(atoi(buffer), threadAnswer);
         }
-        else if( number % 7 == 0 ){
+        else if( number % 7 == 0 ){ //funcion 2
             printf("divisible entre 7: %s\n", buffer);
-            //funcion 2
-            function2(number);
+            piValue(number, threadAnswer);
         }
-        else if( number % 5 == 0 ){
+        else if( number % 5 == 0 ){ //funcion 3
             printf("divisible entre 5: %s\n", buffer);
-            //funcion 3
+            function3(number, threadAnswer);
         }
-        else if( number % 3 == 0 ){
-            printf("divisible entre 3: %s\n", buffer);
-            //funcion 4
+        else if( number % 3 == 0 ){ //funcion 4
+            printf("divisible entre 3: %s\n", buffer);   
         }
-        else if( number % 2 == 0 ){
+        else if( number % 2 == 0 ){ //funcion 5
             printf("divisible entre 2: %s\n", buffer);
-            //funcion 5
         }
 
-        // Responder a cliente        
+        // Responder a cliente
         char timeToReturn[9]; //variable where the current time is stored
         currentTime(timeToReturn); //get current time
-        strcpy(buffer, timeToReturn); //add the time to the buffer
-                //concatenate the answer to the buffer
+        strcpy(buffer, "TIME: ");
+        strcat(buffer, timeToReturn); //add the time to the buffer
+        strcat(buffer, " | ");
+        strcat(buffer, threadAnswer); //concatenate the answer to the buffer
         write(connfd, buffer, strlen(buffer));
         free(buffer);
 
