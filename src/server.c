@@ -143,9 +143,19 @@ void function3(int n) {
     // TODO: Responder al cliente con SUM y hora
 }
 
+void currentTime(char timeString[9]){ // space for "HH:MM:SS\0"
+    
+    time_t current_time;
+    struct tm * time_info;
+
+    time(&current_time);
+    time_info = localtime(&current_time);
+
+    strftime(timeString, 9, "%H:%M:%S", time_info);
+}
 
 int main(int argc, char *argv[]) {
-    
+
     if(argc >= 2)
         omp_set_num_threads(atoi(argv[1]));
     else{
@@ -174,7 +184,6 @@ int main(int argc, char *argv[]) {
         int connfd;
         struct sockaddr_in cli_addr;
         char *buffer = calloc(BUFFSIZE, sizeof(char));
-        // printf("buff 50 %c\n", buffer[50]);
 
     #pragma omp parallel
     {
@@ -187,34 +196,38 @@ int main(int argc, char *argv[]) {
         }
 
         // Leer buffer de cliente
-        read(connfd, buffer, 2);
+        read(connfd, buffer, BUFFSIZE);
 
-        int number = atoi(buffer);
+        int number = atoi(buffer); //store the number read from client
 
         if( number % 9 == 0 ){
-            //funcion 1
             printf("divisible entre 9: %s\n", buffer);
+            //funcion 1
             function1(atoi(buffer));
         }
         else if( number % 7 == 0 ){
+            printf("divisible entre 7: %s\n", buffer);
             //funcion 2
             function2(number);
-            printf("divisible entre 7: %s\n", buffer);
         }
         else if( number % 5 == 0 ){
-            //funcion 3
             printf("divisible entre 5: %s\n", buffer);
+            //funcion 3
         }
         else if( number % 3 == 0 ){
-            //funcion 4
             printf("divisible entre 3: %s\n", buffer);
+            //funcion 4
         }
         else if( number % 2 == 0 ){
-            //funcion 5
             printf("divisible entre 2: %s\n", buffer);
+            //funcion 5
         }
 
-        // Responder a cliente
+        // Responder a cliente        
+        char timeToReturn[9]; //variable where the current time is stored
+        currentTime(timeToReturn); //get current time
+        strcpy(buffer, timeToReturn); //add the time to the buffer
+                //concatenate the answer to the buffer
         write(connfd, buffer, strlen(buffer));
         free(buffer);
 
