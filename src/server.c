@@ -137,7 +137,44 @@ void function3(int n, char sum[50]) {
     sprintf(sum, "Matrix Sum = %d", SUM);
 }
 
-void currentDateTime(char timeString[20]){ // space for "YYYy-MM-DD HH:MM:SS\0"
+int isPrime(int n){ //Function to check if a number is Prime.
+    int x=0;
+    for(int i=2;i<=n/2;i++){
+        if(n%i==0)
+            x++;
+    }
+    if(x==0)//Prime no. has 2 factors-1 and number itself.
+        return 1;
+    else
+        return 0;
+}
+
+void nearestPrime(int n, char nearPrime[4]){
+    int bwdCount=0, fwdCount=0, bwdPrime, fwdPrime; //backward and forward variables
+
+    for(int i=n; ; i++){ //forward loop and break when prime found
+        fwdCount++;
+        if(isPrime(i)){
+            fwdPrime = i;
+            break;
+        }
+    }
+
+    for(int i=n; ;i--){ //backwards loop and break when prime found
+        bwdCount++;
+        if(isPrime(i)){
+            bwdPrime = i;
+            break;
+        }
+    }
+
+    if(fwdCount <= bwdCount)
+        sprintf(nearPrime, "%d", fwdPrime);
+    else
+        sprintf(nearPrime, "%d", bwdPrime);
+}
+
+void currentDateTime(char timeString[20]){ // space for "YYYY-MM-DD HH:MM:SS\0"
     
     time_t current_time;
     struct tm * time_info;
@@ -145,7 +182,7 @@ void currentDateTime(char timeString[20]){ // space for "YYYy-MM-DD HH:MM:SS\0"
     time(&current_time);
     time_info = localtime(&current_time);
 
-    strftime(timeString, 20, "%F %H:%M:%S", time_info);
+    strftime(timeString, 20, "%F %H:%M:%S", time_info); //%F represents YYYY-MM-DD
 }
 
 int main(int argc, char *argv[]) {
@@ -212,6 +249,7 @@ int main(int argc, char *argv[]) {
         }
         else if( number % 2 == 0 ){ //funcion 5
             printf("divisible entre 2: %s\n", buffer);
+            nearestPrime(number, threadAnswer);
         }
 
         // Responder a cliente
