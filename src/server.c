@@ -137,7 +137,7 @@ void function3(int n, char sum[50]) {
     sprintf(sum, "Matrix Sum = %d", SUM);
 }
 
-void currentTime(char timeString[9]){ // space for "HH:MM:SS\0"
+void currentDateTime(char timeString[20]){ // space for "YYYy-MM-DD HH:MM:SS\0"
     
     time_t current_time;
     struct tm * time_info;
@@ -145,7 +145,7 @@ void currentTime(char timeString[9]){ // space for "HH:MM:SS\0"
     time(&current_time);
     time_info = localtime(&current_time);
 
-    strftime(timeString, 9, "%H:%M:%S", time_info);
+    strftime(timeString, 20, "%F %H:%M:%S", time_info);
 }
 
 int main(int argc, char *argv[]) {
@@ -215,9 +215,9 @@ int main(int argc, char *argv[]) {
         }
 
         // Responder a cliente
-        char timeToReturn[9]; //variable where the current time is stored
-        currentTime(timeToReturn); //get current time
-        strcpy(buffer, "TIME: ");
+        char timeToReturn[20]; //variable where the current time is stored
+        currentDateTime(timeToReturn); //get current time
+        strcpy(buffer, "DATE & TIME: ");
         strcat(buffer, timeToReturn); //add the time to the buffer
         strcat(buffer, " | ");
         strcat(buffer, threadAnswer); //concatenate the answer to the buffer
