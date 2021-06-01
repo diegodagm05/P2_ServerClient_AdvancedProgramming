@@ -16,7 +16,7 @@
 
 #define PORT 1025
 #define IP "127.0.0.1"
-#define BUFFSIZE 100
+#define BUFFSIZE 200
 
 int main(int argc, char *argv[]){
     

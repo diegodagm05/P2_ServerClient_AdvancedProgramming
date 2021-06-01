@@ -19,7 +19,7 @@
 #include <time.h>
 
 #define PORT 1025
-#define BUFFSIZE 100
+#define BUFFSIZE 200
 
 #define TCOUNT 5
 
@@ -40,7 +40,6 @@ void linearRegression(int n, char formula[50]){
     float a, b;
 
     srand(time(0));
-
 
     // Fill arrays
     for (int i = 0; i < n; i++) {
@@ -137,6 +136,12 @@ void function3(int n, char sum[50]) {
     sprintf(sum, "Matrix Sum = %d", SUM);
 }
 
+void sendHTML(char html[150]){
+    sprintf(html,"\n<!DOCTYPE html>\n<html>\n\t<body>\n\t\t<h1>Hello Luis</h1>\n\t\t<p>Programming is my passion.</p>\n\t</body>\n</html>");
+    // system("C:\\Program Files (x86)\\Google\\Chrome\\Application");
+    
+}
+
 int isPrime(int n){ //Function to check if a number is Prime.
     int x=0;
     for(int i=2;i<=n/2;i++){
@@ -169,9 +174,9 @@ void nearestPrime(int n, char nearPrime[4]){
     }
 
     if(fwdCount <= bwdCount)
-        sprintf(nearPrime, "%d", fwdPrime);
+        sprintf(nearPrime, "Nearest prime to %d is: %d", n, fwdPrime);
     else
-        sprintf(nearPrime, "%d", bwdPrime);
+        sprintf(nearPrime, "Nearest prime to %d is: %d", n, bwdPrime);
 }
 
 void currentDateTime(char timeString[20]){ // space for "YYYY-MM-DD HH:MM:SS\0"
@@ -230,25 +235,23 @@ int main(int argc, char *argv[]) {
         read(connfd, buffer, BUFFSIZE);
 
         int number = atoi(buffer); //store the number read from client
-        char threadAnswer[50];
+        char threadAnswer[150];
+
+        printf("Server received %s from client\n", buffer);
 
         if( number % 9 == 0 ){ //funcion 1
-            printf("divisible entre 9: %s\n", buffer);
             linearRegression(atoi(buffer), threadAnswer);
         }
         else if( number % 7 == 0 ){ //funcion 2
-            printf("divisible entre 7: %s\n", buffer);
             piValue(number, threadAnswer);
         }
         else if( number % 5 == 0 ){ //funcion 3
-            printf("divisible entre 5: %s\n", buffer);
             function3(number, threadAnswer);
         }
         else if( number % 3 == 0 ){ //funcion 4
-            printf("divisible entre 3: %s\n", buffer);   
+            sendHTML(threadAnswer);
         }
         else if( number % 2 == 0 ){ //funcion 5
-            printf("divisible entre 2: %s\n", buffer);
             nearestPrime(number, threadAnswer);
         }
 
