@@ -18,18 +18,12 @@
 #include <pthread.h>
 #include <time.h>
 
-#define PORT 1025
-#define BUFFSIZE 200
+#include "func.h"
 
 #define TCOUNT 5
 
 int MAT[2000][2000];
 int SUM = 0;
-
-struct arguments {
-    int size;
-    int tnum;
-};
 
 void linearRegression(int n, char formula[50]){
     // Array of numbers
@@ -74,7 +68,7 @@ void piValue(int n, char piValue[12]){
     static long total_steps = 100000;
     double step;
     int i;
-    double x, pi, sum = 0.0;
+    double pi, sum = 0.0;
     step = 1.0/(double)total_steps;
     #pragma omp parallel
     {
@@ -138,7 +132,6 @@ void sumMatrix(int n, char sum[50]){
 
 void sendHTML(char html[150]){
     sprintf(html,"\n<!DOCTYPE html>\n<html>\n\t<body>\n\t\t<h1>Hello Luis</h1>\n\t\t<p>Programming is my passion.</p>\n\t</body>\n</html>");
-    // system("/mnt/c/Users/Dagm/Documents/Progra/pr/pr2/src/test.html &");
 }
 
 int isPrime(int n){ //Function to check if a number is Prime.
@@ -187,95 +180,4 @@ void currentDateTime(char timeString[20]){ // space for "YYYY-MM-DD HH:MM:SS\0"
     time_info = localtime(&current_time);
 
     strftime(timeString, 20, "%F %H:%M:%S", time_info); //%F represents YYYY-MM-DD
-}
-
-int main(int argc, char *argv[]) {
-
-    if(argc >= 2)
-        omp_set_num_threads(atoi(argv[1]));
-    else{
-        omp_set_num_threads(50);
-    }
-        // Crear socket TCP
-        int fd = socket(AF_INET, SOCK_STREAM, 0);
-        
-        // Asignar puerto a socket
-        struct sockaddr_in addr;
-        addr.sin_family = AF_INET;    
-        addr.sin_port = htons(PORT);    
-        addr.sin_addr.s_addr = INADDR_ANY;  
-        
-        // Poner socket en modo escucha (bind)    
-        if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) == -1) {        
-            perror("Unable to bind\n");        
-            close(fd);        
-            exit(1);    
-        }    
-        if (listen(fd, 1) == -1){        
-            perror("Unable to listen\n");    
-        }    
-        
-        // Repetir
-        int connfd;
-        struct sockaddr_in cli_addr;
-
-    while(1){
-        #pragma omp parallel
-        {
-            char *buffer = calloc(BUFFSIZE, sizeof(char));
-
-            // Aceptar nueva conexion
-            socklen_t cli_addr_len = sizeof(cli_addr);        
-            connfd = accept(fd, NULL, NULL);
-
-            if (connfd == -1){
-                perror("Unable to connect\n");      
-            }
-
-            // Leer buffer de cliente
-            read(connfd, buffer, BUFFSIZE);
-
-            int number = atoi(buffer); //store the number read from client
-            char threadAnswer[BUFFSIZE];
-
-            printf("Server received %s from client\n", buffer);
-
-            if( number % 9 == 0 ){ //funcion 1
-                linearRegression(atoi(buffer), threadAnswer);
-            }
-            else if( number % 7 == 0 ){ //funcion 2
-                piValue(number, threadAnswer);
-            }
-            else if( number % 5 == 0 ){ //funcion 3
-                sumMatrix(number, threadAnswer);
-            }
-            else if( number % 3 == 0 ){ //funcion 4
-                sendHTML(threadAnswer);
-            }
-            else if( number % 2 == 0 ){ //funcion 5
-                nearestPrime(number, threadAnswer);
-            }
-            else{
-                printf("Number %d does not have a function\n", number);
-            }
-
-            // Responder a cliente
-            char timeToReturn[20]; //variable where the current time is stored
-            currentDateTime(timeToReturn); //get current time
-            strcpy(buffer, "DATE & TIME: ");
-            strcat(buffer, timeToReturn); //add the time to the buffer
-            strcat(buffer, " | ");
-            strcat(buffer, threadAnswer); //concatenate the answer to the buffer
-            #pragma omp critical
-            {
-                write(connfd, buffer, strlen(buffer));
-            }
-                free(buffer);
-
-            // Cerrar conexion
-            close(connfd);
-        }
-    }
-    close(fd);
-    return 0;
 }
