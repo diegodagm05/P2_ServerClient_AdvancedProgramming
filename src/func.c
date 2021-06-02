@@ -92,6 +92,7 @@ void *sumScalar(void *args) {
             SUM += MAT[i][j];
         }
     }
+    return NULL;
 }
 
 void sumMatrix(int n, char sum[50]){
